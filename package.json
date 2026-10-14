@@ -1,0 +1,25 @@
+{
+  "name": "subagent-mail-cli",
+  "version": "0.1.0",
+  "description": "Ligne de commande de Subagent Mail : des boîtes mail pour agents IA, avec des règles d'envoi appliquées par le serveur.",
+  "license": "MIT",
+  "author": "Subagent <contact@subagent.fr> (https://subagent.fr)",
+  "homepage": "https://subagent.fr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subagent-fr/subagent-cli.git"
+  },
+  "bugs": "https://github.com/subagent-fr/subagent-cli/issues",
+  "keywords": ["email", "e-mail", "agent", "ia", "ai-agent", "mcp", "cli", "subagent"],
+  "type": "module",
+  "bin": {
+    "subagent": "bin/subagent.mjs"
+  },
+  "files": ["bin", "lib", "reference.md"],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/cli.test.mjs tests/operations.test.mjs"
+  }
+}
