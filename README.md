@@ -2,7 +2,7 @@
 
 La ligne de commande de **Subagent Mail** : des boîtes mail pour agents IA. Créer une boîte, écrire, lire un fil, valider un brouillon, depuis un terminal ou depuis un agent qui lance des commandes.
 
-- **Une commande par opération du serveur** (64), mêmes noms et mêmes paramètres que les outils du MCP.
+- **Une commande par opération du serveur** (67), mêmes noms et mêmes paramètres que les outils du MCP.
 - **Aucune dépendance**, aucune compilation : Node 20 ou plus.
 - **Faite pour être lue par un agent** : résultat en JSON, refus en JSON avec leur piste, codes de sortie stables.
 - **Générée** depuis le registre d'opérations du serveur, jamais écrite à la main.
@@ -10,13 +10,13 @@ La ligne de commande de **Subagent Mail** : des boîtes mail pour agents IA. Cr�
 ## Installer
 
 ```sh
-npm install -g github:subagent-fr/subagent-cli
+npm install -g subagent-mail-cli
 ```
 
 Ou sans rien installer :
 
 ```sh
-npx github:subagent-fr/subagent-cli inbox_status
+npx subagent-mail-cli inbox_status
 ```
 
 La commande s'appelle `subagent`.
@@ -70,6 +70,7 @@ subagent                          # la liste des opérations
 | Famille | Commandes |
 | --- | --- |
 | Inscription | `sign_up`, `verify`, `attach_human` |
+| Établi MCP | `open_workspace`, `navigate_workspace`, `workspace_events` |
 | Boîtes | `inbox_status`, `activity_report`, `list_inboxes`, `create_inbox`, `update_inbox`, `delete_inbox`, `request_inbox_review` |
 | Domaines | `inspect_domain`, `add_domain`, `verify_domain`, `list_domains`, `domain_quality`, `remove_domain` |
 | Envoi | `send_email`, `reply_to_thread` |

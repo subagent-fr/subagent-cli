@@ -48,6 +48,57 @@ Accès : permission `read` ou `send` ou `approve` ou `manage_inboxes` · espace 
 subagent attach_human --human_email marie@exemple.fr
 ```
 
+## Établi MCP
+
+### `open_workspace`
+
+Ouvrir Subagent. Ouvre un établi Subagent dans cette conversation. À appeler une seule fois lorsqu’aucun établi n’est ouvert. Ensuite utilisez navigate_workspace avec l’instance_id fourni par la vue : audiences, contacts, campagnes et performances changent dans le même établi. Accepte {} pour le panneau de conversation.
+
+Accès : permission `send` ou `read` ou `approve` ou `manage_inboxes`. Rend : `_navigation`, `closed`, `instance_id`, `sequence`, `status`, `unchanged`.
+
+| Paramètre | Type | Obligatoire | Description |
+| --- | --- | --- | --- |
+| `page` | `jour` ou `valider` ou `fils` ou `campagnes` ou `audiences` ou `contacts` ou `boites` ou `domaines` ou `blocages` ou `espace` ou `performances` | non | Rubrique à afficher. jour par défaut. performances avec campaign_id montre les résultats de cette campagne. |
+| `arguments` | objet | non | Arguments de lecture de la page : query pour chercher un contact, email pour sa fiche, campaign_id, audience_id, thread_id ou message_id pour ouvrir un détail. Aucun envoi. |
+
+```sh
+subagent open_workspace
+```
+
+### `navigate_workspace`
+
+Afficher une page dans Subagent. Pilote l’établi déjà ouvert, sans créer de carte. Reprenez l’instance_id du contexte de cette conversation. page=audiences, contacts ou campagnes ; performances avec arguments.campaign_id pour une campagne sélectionnée. Une navigation demandée peut attendre la fin d’une saisie : ne prétendez pas qu’elle est déjà affichée. Aucun envoi.
+
+Accès : permission `send` ou `read` ou `approve` ou `manage_inboxes`. Rend : `_navigation`, `closed`, `instance_id`, `sequence`, `status`, `unchanged`.
+
+| Paramètre | Type | Obligatoire | Description |
+| --- | --- | --- | --- |
+| `instance_id` | texte | oui | Identifiant de l’établi actif, fourni par son contexte. Ne jamais en inventer ni reprendre celui d’une autre conversation. |
+| `page` | `jour` ou `valider` ou `fils` ou `campagnes` ou `audiences` ou `contacts` ou `boites` ou `domaines` ou `blocages` ou `espace` ou `performances` | oui | Rubrique à afficher. jour par défaut. performances avec campaign_id montre les résultats de cette campagne. |
+| `arguments` | objet | non | Arguments de lecture de la page : query pour chercher un contact, email pour sa fiche, campaign_id, audience_id, thread_id ou message_id pour ouvrir un détail. Aucun envoi. |
+
+```sh
+subagent navigate_workspace --instance_id 8abf26e0-f58a-4a49-8cb2-90858b2df812 --page audiences
+```
+
+### `workspace_events`
+
+Synchroniser l’établi. Réservé à la vue : attend jusqu’à 18 secondes une navigation de cette instance. after_sequence est la dernière commande reçue ; ack_sequence la dernière appliquée. Les lectures et permissions sont revérifiées. Aucun envoi.
+
+Accès : permission `send` ou `read` ou `approve` ou `manage_inboxes`. Rend : `_navigation`, `closed`, `instance_id`, `sequence`, `status`, `unchanged`.
+
+| Paramètre | Type | Obligatoire | Description |
+| --- | --- | --- | --- |
+| `instance_id` | texte | oui | Instance de cet établi. |
+| `after_sequence` | entier | oui |  |
+| `ack_sequence` | entier | non |  |
+| `close` | booléen | non | Libère cette instance à la fermeture de la vue, sans attendre. |
+| `local_navigation` | booléen | non | Barrière de séquence après un geste de navigation local. Invalide les commandes précédentes sans relire la page. |
+
+```sh
+subagent workspace_events --instance_id 8abf26e0-f58a-4a49-8cb2-90858b2df812 --after_sequence 0
+```
+
 ## Boîtes
 
 ### `inbox_status`
@@ -1107,7 +1158,7 @@ Un refus sort en JSON sur la sortie d'erreur (`{"error": {"code", "message", "hi
 | --- | --- | --- | --- |
 | `attachments_not_allowed` | 409 | Le message n'est pas une réponse dans une conversation, ni un message vers une adresse de l'espace. | Envoyer le premier message sans pièce. Quand le correspondant a répondu, joindre la pièce à la réponse. |
 | `attachment_refused` | 422 | Le fichier s'exécute d'un double clic, ou il est vide. | Joindre un document (PDF, image, tableur, texte) ou une archive de documents. |
-| `attachment_limit` | 409 | Le message porte déjà 10 pièces, ses pièces dépasseraient 10 Mo, l'espace garde déjà 500 Mo de pièces envoyées, le service a atteint son plafond, ou le lien de dépôt a déjà reçu 30 Mo. Sur le lien de dépôt, un envoi de plus de 10 Mo répond 413. | Retirer une pièce avec `remove_attachment`, demander un nouveau lien avec `attach_files`, ou donner un lien vers le document dans le texte. |
+| `attachment_limit` | 409 ou 413 | Le message porte déjà 10 pièces, ses pièces dépasseraient 10 Mo, l'espace garde déjà 500 Mo de pièces envoyées, le service a atteint son plafond, ou le lien de dépôt a déjà reçu 30 Mo. Sur le lien de dépôt, un envoi de plus de 10 Mo répond 413. | Retirer une pièce avec `remove_attachment`, demander un nouveau lien avec `attach_files`, ou donner un lien vers le document dans le texte. |
 | `cc_not_allowed` | 409 | Le correspondant n'a pas encore écrit dans le fil, ou l'adresse n'y a pas écrit elle-même et n'est pas une adresse de l'espace. | Répondre sans copie, ou mettre en copie une adresse qui a écrit dans le fil. |
 | `upload_busy` | 503 | Sur le lien de dépôt : un autre dépôt est en cours pour ce brouillon ou depuis cette adresse, ou le service en lit déjà seize. | Réessayer dans un instant. |
 | `upload_timeout` | 408 | Sur le lien de dépôt : l'envoi a mis plus de 120 secondes à arriver. | Réessayer, avec des fichiers plus légers si la connexion est lente. |
@@ -1142,13 +1193,24 @@ Un refus sort en JSON sur la sortie d'erreur (`{"error": {"code", "message", "hi
 | `campaign_not_ready` | 422 | L'aperçu signale des destinataires ou des champs bloquants : la campagne ne peut pas partir. | Relire `preview_campaign`, corriger l'audience ou les messages, puis relancer. |
 | `campaign_changed` | 409 | La campagne ou son audience a changé depuis l'aperçu dont la `revision` est donnée. | Relire `preview_campaign` et lancer avec sa nouvelle `revision`. |
 | `campaign_transition` | 409 | L'action demandée ne s'applique pas à une campagne dans cet état (par exemple reprendre une campagne qui n'est pas en pause). | Lire son état avec `get_campaign`, puis choisir l'action qui convient. |
+| `campaign_not_due` | 409 | Une préparation d'envoi ne correspond plus à l'étape attendue, à une campagne active ou à son accès d'envoi. | Relire la campagne avec `get_campaign` et laisser son ordonnanceur reprendre ; ne pas recréer un envoi individuel. |
+
+### Reprise d'historique
+
+| `code` | HTTP | Ce qui s'est passé | Que faire |
+| --- | --- | --- | --- |
+| `history_owner` | 403 | Le propriétaire de l'export ne correspond pas à l'humain vérifié de l'espace destinataire. | Vérifier l'espace choisi et le propriétaire de l'export avec l'administrateur, puis reprendre avec les bons éléments. |
+| `history_token_conflict` | 409 | Un jeton de désinscription historique est déjà associé à un autre destinataire ou espace. | Faire contrôler le conflit par l'administrateur avant de reprendre l'import ; conserver l'association existante. |
 
 ### L'application dans l'assistant
 
 | `code` | HTTP | Ce qui s'est passé | Que faire |
 | --- | --- | --- | --- |
-| `access_changed` | 409 | Les droits de la connexion ont changé pendant que l'application préparait ses pages. | Relire l'espace : l'application le fait d'elle-même. |
+| `access_changed` | 409 | Les droits de la connexion ont changé pendant une lecture ou la synchronisation de l'établi. | Rouvrir l'établi avec l'accès actuel ; le contexte de l'ancien accès ne vaut plus. |
 | `workspace_changing` | 409 | L'espace est en cours d'actualisation. | Réessayer dans un instant. |
+| `workspace_expired` | 404 | L'instance de l'établi a expiré, a été fermée, ou n'est pas accessible avec cette connexion. | Rouvrir avec `open_workspace`, puis reprendre le nouvel `instance_id` fourni par cette conversation. |
+| `workspace_busy` | 429 | Deux synchronisations attendent déjà pour cette instance, ou le service a atteint sa limite de 64 attentes simultanées. | Garder une seule attente à la fois dans la vue, puis réessayer avec un délai. |
+| `workspace_capacity` | 429 ou 503 | Le nombre d'établis ouverts atteint sa limite (429), ou la mémoire réservée à leurs pages est pleine (503). | Réutiliser l'instance de cette conversation, fermer les vues inutilisées et réessayer dans un instant. |
 
 ### Accès et requêtes
 

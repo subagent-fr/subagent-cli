@@ -13,6 +13,14 @@
       ]
     },
     {
+      "titre": "Établi MCP",
+      "operations": [
+        "open_workspace",
+        "navigate_workspace",
+        "workspace_events"
+      ]
+    },
+    {
       "titre": "Boîtes",
       "operations": [
         "inbox_status",
@@ -210,6 +218,143 @@
         }
       ],
       "exemple": "subagent attach_human --human_email marie@exemple.fr"
+    },
+    {
+      "nom": "open_workspace",
+      "titre": "Ouvrir Subagent",
+      "description": "Ouvre un établi Subagent dans cette conversation. À appeler une seule fois lorsqu’aucun établi n’est ouvert. Ensuite utilisez navigate_workspace avec l’instance_id fourni par la vue : audiences, contacts, campagnes et performances changent dans le même établi. Accepte {} pour le panneau de conversation.",
+      "sans_cle": false,
+      "permissions": [
+        "send",
+        "read",
+        "approve",
+        "manage_inboxes"
+      ],
+      "espace": "tout",
+      "idempotence": false,
+      "parametres": [
+        {
+          "nom": "page",
+          "type": "texte",
+          "obligatoire": false,
+          "description": "Rubrique à afficher. jour par défaut. performances avec campaign_id montre les résultats de cette campagne.",
+          "valeurs": [
+            "jour",
+            "valider",
+            "fils",
+            "campagnes",
+            "audiences",
+            "contacts",
+            "boites",
+            "domaines",
+            "blocages",
+            "espace",
+            "performances"
+          ]
+        },
+        {
+          "nom": "arguments",
+          "type": "objet",
+          "obligatoire": false,
+          "description": "Arguments de lecture de la page : query pour chercher un contact, email pour sa fiche, campaign_id, audience_id, thread_id ou message_id pour ouvrir un détail. Aucun envoi."
+        }
+      ],
+      "exemple": "subagent open_workspace"
+    },
+    {
+      "nom": "navigate_workspace",
+      "titre": "Afficher une page dans Subagent",
+      "description": "Pilote l’établi déjà ouvert, sans créer de carte. Reprenez l’instance_id du contexte de cette conversation. page=audiences, contacts ou campagnes ; performances avec arguments.campaign_id pour une campagne sélectionnée. Une navigation demandée peut attendre la fin d’une saisie : ne prétendez pas qu’elle est déjà affichée. Aucun envoi.",
+      "sans_cle": false,
+      "permissions": [
+        "send",
+        "read",
+        "approve",
+        "manage_inboxes"
+      ],
+      "espace": "tout",
+      "idempotence": false,
+      "parametres": [
+        {
+          "nom": "instance_id",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Identifiant de l’établi actif, fourni par son contexte. Ne jamais en inventer ni reprendre celui d’une autre conversation."
+        },
+        {
+          "nom": "page",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Rubrique à afficher. jour par défaut. performances avec campaign_id montre les résultats de cette campagne.",
+          "valeurs": [
+            "jour",
+            "valider",
+            "fils",
+            "campagnes",
+            "audiences",
+            "contacts",
+            "boites",
+            "domaines",
+            "blocages",
+            "espace",
+            "performances"
+          ]
+        },
+        {
+          "nom": "arguments",
+          "type": "objet",
+          "obligatoire": false,
+          "description": "Arguments de lecture de la page : query pour chercher un contact, email pour sa fiche, campaign_id, audience_id, thread_id ou message_id pour ouvrir un détail. Aucun envoi."
+        }
+      ],
+      "exemple": "subagent navigate_workspace --instance_id 8abf26e0-f58a-4a49-8cb2-90858b2df812 --page audiences"
+    },
+    {
+      "nom": "workspace_events",
+      "titre": "Synchroniser l’établi",
+      "description": "Réservé à la vue : attend jusqu’à 18 secondes une navigation de cette instance. after_sequence est la dernière commande reçue ; ack_sequence la dernière appliquée. Les lectures et permissions sont revérifiées. Aucun envoi.",
+      "sans_cle": false,
+      "permissions": [
+        "send",
+        "read",
+        "approve",
+        "manage_inboxes"
+      ],
+      "espace": "tout",
+      "idempotence": false,
+      "parametres": [
+        {
+          "nom": "instance_id",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Instance de cet établi."
+        },
+        {
+          "nom": "after_sequence",
+          "type": "entier",
+          "obligatoire": true,
+          "description": ""
+        },
+        {
+          "nom": "ack_sequence",
+          "type": "entier",
+          "obligatoire": false,
+          "description": ""
+        },
+        {
+          "nom": "close",
+          "type": "booléen",
+          "obligatoire": false,
+          "description": "Libère cette instance à la fermeture de la vue, sans attendre."
+        },
+        {
+          "nom": "local_navigation",
+          "type": "booléen",
+          "obligatoire": false,
+          "description": "Barrière de séquence après un geste de navigation local. Invalide les commandes précédentes sans relire la page."
+        }
+      ],
+      "exemple": "subagent workspace_events --instance_id 8abf26e0-f58a-4a49-8cb2-90858b2df812 --after_sequence 0"
     },
     {
       "nom": "inbox_status",

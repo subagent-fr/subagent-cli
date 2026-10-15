@@ -11,7 +11,7 @@ import { CLE_HUMAIN, FauxServeur, OPERATIONS } from "./faux-serveur.mjs";
 
 const COMMANDE = fileURLToPath(new URL("../bin/subagent.mjs", import.meta.url));
 
-describe("chaque opération du registre (64)", () => {
+describe("chaque opération du registre (67)", () => {
   let serveur;
   before(async () => {
     serveur = await new FauxServeur().demarrer();
@@ -59,6 +59,36 @@ describe("chaque opération du registre (64)", () => {
     controler("attach_human", [
       "--human_email",
       "marie@exemple.fr",
+    ]));
+
+  test("open_workspace", () =>
+    controler("open_workspace", [
+      "--page",
+      "audiences",
+      "--arguments",
+      "{}",
+    ]));
+
+  test("navigate_workspace", () =>
+    controler("navigate_workspace", [
+      "--instance_id",
+      "8abf26e0-f58a-4a49-8cb2-90858b2df812",
+      "--page",
+      "audiences",
+      "--arguments",
+      "{}",
+    ]));
+
+  test("workspace_events", () =>
+    controler("workspace_events", [
+      "--instance_id",
+      "8abf26e0-f58a-4a49-8cb2-90858b2df812",
+      "--after_sequence",
+      "0",
+      "--ack_sequence",
+      "0",
+      "--close=false",
+      "--local_navigation=false",
     ]));
 
   test("inbox_status", () =>
