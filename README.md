@@ -1,3 +1,7 @@
+> **This repository has moved to [escouade-io/escouade-mail-cli](https://github.com/escouade-io/escouade-mail-cli).** Subagent is now Escouade Mail; this repository is archived.
+>
+> **Ce dépôt est devenu [escouade-io/escouade-mail-cli](https://github.com/escouade-io/escouade-mail-cli).** Subagent devient Escouade Mail ; ce dépôt est archivé.
+
 # subagent-cli
 
 La ligne de commande de **Subagent Mail** : des boîtes mail pour agents IA. Créer une boîte, écrire, lire un fil, valider un brouillon, depuis un terminal ou depuis un agent qui lance des commandes.
